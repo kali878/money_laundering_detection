@@ -27,6 +27,10 @@ st.title("📂 CSV Upload for Batch Prediction")
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 if uploaded_file is not None:
+   # CSV Upload
+ uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+
+if uploaded_file is not None:
     # Read CSV file
     df = pd.read_csv(uploaded_file)
     st.write("✅ File uploaded successfully!")
@@ -35,9 +39,11 @@ if uploaded_file is not None:
     # Agar aapke model ka predict function hai to yaha use kar sakte ho
     if st.button("Run Batch Prediction"):
         # Example: model prediction
-        predictions = model.predict(df)   # yaha model ko load karke use karna hoga
+        # NOTE: model ko load karna zaroori hai, warna error aayega
+        predictions = model.predict(df)   
         df["Prediction"] = predictions
         st.write("Predictions:", df)
+
         # Agar download bhi karwana ho:
         csv_output = df.to_csv(index=False).encode("utf-8")
         st.download_button(
