@@ -18,3 +18,31 @@ if st.button("Predict"):
         st.error("⚠️ Suspicious Transaction (Possible Money Laundering)")
     else:
         st.success("✅ Normal Transaction")
+import streamlit as st
+import pandas as pd
+
+st.title("📂 CSV Upload for Batch Prediction")
+
+# CSV upload option
+uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
+
+if uploaded_file is not None:
+    # Read CSV file
+    df = pd.read_csv(uploaded_file)
+    st.write("✅ File uploaded successfully!")
+    st.write("Preview of your data:", df.head())
+
+    # Agar aapke model ka predict function hai to yaha use kar sakte ho
+    if st.button("Run Batch Prediction"):
+        # Example: model prediction
+        predictions = model.predict(df)   # yaha model ko load karke use karna hoga
+        df["Prediction"] = predictions
+        st.write("Predictions:", df)
+        # Agar download bhi karwana ho:
+        csv_output = df.to_csv(index=False).encode("utf-8")
+        st.download_button(
+            "Download Predictions",
+            data=csv_output,
+            file_name="predictions.csv",
+            mime="text/csv"
+        )
