@@ -5,7 +5,7 @@ from src.model import predict_transaction, predict_from_csv
 
 # Single transaction prediction
 def predict_transaction(amount, country, account_age):
-    model = joblib.load('reports/compliance/model.pkl')
+    model = joblib.load("reports/compliance/model.pkl")
     # Create DataFrame for prediction - add all required features here
     data = {
         "amount": [amount],
@@ -22,7 +22,7 @@ def predict_transaction(amount, country, account_age):
 
 # Bulk CSV prediction
 def predict_from_csv(csv_file):
-    model = joblib.load('reports/compliance/model.pkl')
+    model = joblib.load("reports/compliance/model.pkl")
     df = pd.read_csv(csv_file)
 
     # Preprocess if needed
