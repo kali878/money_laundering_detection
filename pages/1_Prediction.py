@@ -1,32 +1,42 @@
+import streamlit as st
+import pandas as pd
 import sys
 import os
+
+# --- Fix path so "src" folder accessible ---
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-import pandas as pd
-import streamlit as st
-from src.model import predict_transaction   # tumhara model ka function
 
-# 🔹 Data loading function
-def load_data(filename):
-    return pd.read_csv(f"data/{filename}")
+from src.model import predict_transaction   # yeh tumhara model ka function
 
-st.title("💸 Money Laundering Detection App")
+# -------------------------------
+# Streamlit UI
+# -------------------------------
+st.set_page_config(page_title="💸 MONEY LAUNDERING PATTERN DETECTION", page_icon="💰")
 
-# 🔹 Dataset selection
-file_choice = st.selectbox(
-    "Choose dataset",
-    ["new_transactions.csv", "transactions_fixed.csv"]
-)
+st.title("💸 MONEY LAUNDERING PATTERN DETECTION")
+st.write("Yeh app transactions ko predict karega ki wo **Normal** hai ya **Suspicious**.")
 
-# 🔹 Load selected dataset
-df = load_data(file_choice)
-st.write("📊 Preview of selected data:")
-st.dataframe(df.head())
+# User inputs
+amount = st.number_input("Enter Transaction Amount (₹)", min_value=0.0, step=100.0)
+country = st.text_input("Enter Country")
+account_number = st.text_input("Enter Account Number")
+account_age = st.number_input("Enter Account Age (days)", min_value=0, step=1)
 
-# 🔹 User input for prediction
-amount = st.number_input("Transaction Amount", min_value=0.0)
-country = st.text_input("Country")
-account_age = st.number_input("Account Age (days)", min_value=0)
+# Predict button
+if st.button("🔍 Predict"):
+    if country.strip() == "":
+        st.warning("⚠️ Please enter a country name.")
+    else:
+        # Call model function
+        result = predict_transaction(amount, country, account_number, account_age)
+        st.success(f"Prediction Result: **{result}**")
 
-if st.button("Predict"):
-    result = predict_transaction(amount, country, account_age)
-    st.success(f"Prediction: {result}")
+# Show uploaded dataset option
+st.subheader("📂 View Sample Transactions")
+uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+
+if uploaded_file is not None:
+    df = pd.read_csv(uploaded_file)
+    st.write("Uploaded Data Preview:")
+    st.dataframe(df.head())
+ 

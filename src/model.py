@@ -11,3 +11,21 @@ def predict_transaction(txn):
         return {"transaction_id": txn["transaction_id"], "prediction": "Suspicious"}
     else:
         return {"transaction_id": txn["transaction_id"], "prediction": "Normal"}
+    
+    def predict_transaction(amount, country, account_number, account_age):
+        """
+        Simple rule-based prediction function.
+        Replace this with ML model later.
+        """
+        suspicious_countries = ["Cayman Islands", "Panama", "Bahamas", "Malta"]
+
+        if amount > 100000:
+           return "Suspicious: High amount transaction"
+
+        if country in suspicious_countries:
+           return "Suspicious: High-risk country"
+
+        if account_age < 30:
+           return "Suspicious: New account"
+
+        return "Normal Transaction ✅"
