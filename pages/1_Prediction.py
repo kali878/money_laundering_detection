@@ -7,7 +7,7 @@ st.title("🔮 Transaction Prediction")
 # Load dataset
 @st.cache_data
 def load_data():
-    return pd.read_csv("data/transaction.csv")
+   return pd.read_csv(r"D:\python\money_laundering_detection\data\transaction.csv")
 
 df = load_data()
 
