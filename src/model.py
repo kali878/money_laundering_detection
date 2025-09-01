@@ -17,8 +17,8 @@ def predict_transaction(amount, country, account_age):
 
 # Bulk CSV prediction
 def predict_from_csv(csv_file):
-    model = joblib.load("reports/compliance/model.pkl")
     df = pd.read_csv(csv_file)
+    model = joblib.load("reports/compliance/model.pkl")
     predictions = model.predict(df)
     df['prediction'] = predictions
     return df
