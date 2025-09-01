@@ -1,3 +1,4 @@
+from src.scorer import AnomalyScorer
 import streamlit as st
 from src.model import predict_transaction, predict_from_csv
 
