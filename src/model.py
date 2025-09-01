@@ -46,7 +46,7 @@ def predict_transaction(transaction_data):
     """
     transaction_data: dict, eg. {"amount": 5000, "account_age": 365}
     """
-    model = joblib.load("model.pkl")
+    model = joblib.load('reports/compliance/model.pkl')
     df = pd.DataFrame([transaction_data])
 
     # Ensure columns match model training
@@ -62,7 +62,7 @@ def predict_transaction(transaction_data):
 # 3️⃣ Batch Prediction from CSV
 # ================================
 def predict_from_csv(csv_path):
-    model = joblib.load("model.pkl")
+    model = joblib.load('reports/compliance/model.pkl')
     df = pd.read_csv(csv_path)
 
     required_columns = ["amount", "account_age"]
