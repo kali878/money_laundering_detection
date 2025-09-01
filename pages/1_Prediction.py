@@ -1,34 +1,29 @@
-import sys
-import os
-
-# Project root ko Python path me add karo
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from src.model import predict_transaction
-
-import streamlit as st
 import pandas as pd
-from src.model import predict_transaction   # ye function model.py se aayega
+import streamlit as st
+from src.model import predict_transaction   # tumhara model ka function
 
-st.title("🔮 Transaction Prediction")
+# 🔹 Data loading function
+def load_data(filename):
+    return pd.read_csv(f"data/{filename}")
 
-# Load dataset
-@st.cache_data
-def load_data():
-   return pd.read_csv(r"D:\python\money_laundering_detection\data\transaction.csv")
+st.title("💸 Money Laundering Detection App")
 
-df = load_data()
+# 🔹 Dataset selection
+file_choice = st.selectbox(
+    "Choose dataset",
+    ["transaction.csv", "new_transactions.csv", "transactions_fixed.csv"]
+)
 
-# Show sample transactions
-st.subheader("📊 Sample Transactions")
-st.dataframe(df.head(10))
+# 🔹 Load selected dataset
+df = load_data(file_choice)
+st.write("📊 Preview of selected data:")
+st.dataframe(df.head())
 
-# Select transaction for prediction
-st.subheader("🔎 Select a Transaction")
-txn_id = st.selectbox("Choose Transaction ID", df["transaction_id"].unique())
+# 🔹 User input for prediction
+amount = st.number_input("Transaction Amount", min_value=0.0)
+country = st.text_input("Country")
+account_age = st.number_input("Account Age (days)", min_value=0)
 
 if st.button("Predict"):
-    txn = df[df["transaction_id"] == txn_id].iloc[0].to_dict()
-    result = predict_transaction(txn)   # yahan se model ko call karega
-    st.write("### 🧾 Prediction Result")
-    st.json(result)
+    result = predict_transaction(amount, country, account_age)
+    st.success(f"Prediction: {result}")
