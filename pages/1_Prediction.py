@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Project root ko Python path me add karo
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from src.model import predict_transaction
+
 import streamlit as st
 import pandas as pd
 from src.model import predict_transaction   # ye function model.py se aayega
