@@ -14,7 +14,7 @@ st.title("💸 Money Laundering Detection App")
 # 🔹 Dataset selection
 file_choice = st.selectbox(
     "Choose dataset",
-    ["transaction.csv", "new_transactions.csv", "transactions_fixed.csv"]
+    ["new_transactions.csv", "transactions_fixed.csv"]
 )
 
 # 🔹 Load selected dataset
