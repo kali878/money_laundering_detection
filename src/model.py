@@ -1,6 +1,6 @@
 import pandas as pd
 import joblib
-from src.anomaly_scorer import AnomalyScorer  # Change path as per your project structure
+from src.scorer import AnomalyScorer  # Change path as per your project structure
 
 # Single transaction prediction
 def predict_transaction(amount, country, account_age):
