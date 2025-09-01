@@ -1,9 +1,10 @@
+# train_model.py
 import pandas as pd
 import joblib
 import os
-from src.scorer import AnomalyScorer
+from src.scorer import AnomalyScorer  # 👈 Make sure you import it from src.scorer
 
-df = pd.read_csv("data/new_transactions.csv")  # ✔️ make sure this file exists
+df = pd.read_csv("data/new_transactions.csv")
 
 model = AnomalyScorer()
 
