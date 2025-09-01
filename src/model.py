@@ -1,31 +1,44 @@
-def predict_transaction(txn):
-    """
-    txn ek dictionary hai ek transaction ka
-    Example: {'transaction_id': 'TXN0001', 'amount': 5000, 'transaction_type': 'Transfer'}
-    """
-    amount = txn["amount"]
-    txn_type = txn["transaction_type"]
+import pandas as pd
+import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
 
-    # Simple rule
-    if amount > 10000 or (txn_type == "Transfer" and amount > 5000):
-        return {"transaction_id": txn["transaction_id"], "prediction": "Suspicious"}
-    else:
-        return {"transaction_id": txn["transaction_id"], "prediction": "Normal"}
-    
-    def predict_transaction(amount, country, account_number, account_age):
-        """
-        Simple rule-based prediction function.
-        Replace this with ML model later.
-        """
-        suspicious_countries = ["Cayman Islands", "Panama", "Bahamas", "Malta"]
+MODEL_PATH = "src/model.pkl"
 
-        if amount > 100000:
-           return "Suspicious: High amount transaction"
+# Train & save model (run once)
+def train_and_save_model(csv_path="data/transactions_fixed.csv"):
+    df = pd.read_csv(csv_path)
 
-        if country in suspicious_countries:
-           return "Suspicious: High-risk country"
+    # Example preprocessing (modify as per dataset)
+    X = df[["amount", "account_age"]]  # features
+    y = df["label"]  # target (0 = legit, 1 = suspicious)
 
-        if account_age < 30:
-           return "Suspicious: New account"
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X, y)
 
-        return "Normal Transaction ✅"
+    joblib.dump(model, MODEL_PATH)
+    print("✅ Model trained & saved!")
+
+# Load trained model
+def load_model():
+    return joblib.load(MODEL_PATH)
+
+# Predict single transaction
+def predict_transaction(amount, country, account_age):
+    model = load_model()
+
+    # For simplicity, ignoring 'country' now
+    X = pd.DataFrame([[amount, account_age]], columns=["amount", "account_age"])
+    pred = model.predict(X)[0]
+    return "🚨 Suspicious" if pred == 1 else "✅ Legitimate"
+
+# Predict from CSV
+def predict_from_csv(csv_file):
+    model = load_model()
+    df = pd.read_csv(csv_file)
+
+    # Ensure correct columns
+    X = df[["amount", "account_age"]]
+    df["prediction"] = model.predict(X)
+    df["prediction"] = df["prediction"].map({0: "✅ Legitimate", 1: "🚨 Suspicious"})
+    return df

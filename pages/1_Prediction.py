@@ -1,42 +1,37 @@
 import streamlit as st
 import pandas as pd
-import sys
-import os
+import sys, os
 
-# --- Fix path so "src" folder accessible ---
+# Add parent path to sys.path so src works
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from src.model import predict_transaction, predict_from_csv
 
-from src.model import predict_transaction   # yeh tumhara model ka function
+st.title("💸 Money Laundering Detection App")
 
-# -------------------------------
-# Streamlit UI
-# -------------------------------
-st.set_page_config(page_title="💸 MONEY LAUNDERING PATTERN DETECTION", page_icon="💰")
+# --- Sidebar navigation ---
+choice = st.sidebar.radio("Choose option:", ["🔹 Single Prediction", "📂 Bulk CSV Prediction"])
 
-st.title("💸 MONEY LAUNDERING PATTERN DETECTION")
-st.write("Yeh app transactions ko predict karega ki wo **Normal** hai ya **Suspicious**.")
+# --- Single transaction prediction ---
+if choice == "🔹 Single Prediction":
+    st.subheader("🔹 Enter Transaction Details")
 
-# User inputs
-amount = st.number_input("Enter Transaction Amount (₹)", min_value=0.0, step=100.0)
-country = st.text_input("Enter Country")
-account_number = st.text_input("Enter Account Number")
-account_age = st.number_input("Enter Account Age (days)", min_value=0, step=1)
+    amount = st.number_input("Transaction Amount", min_value=0.0, format="%.2f")
+    country = st.text_input("Country (optional)")
+    account_age = st.number_input("Account Age (in days)", min_value=0)
 
-# Predict button
-if st.button("🔍 Predict"):
-    if country.strip() == "":
-        st.warning("⚠️ Please enter a country name.")
-    else:
-        # Call model function
-        result = predict_transaction(amount, country, account_number, account_age)
-        st.success(f"Prediction Result: **{result}**")
+    if st.button("Predict"):
+        result = predict_transaction(amount, country, account_age)
+        st.success(f"Prediction: {result}")
 
-# Show uploaded dataset option
-st.subheader("📂 View Sample Transactions")
-uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+# --- CSV file prediction ---
+elif choice == "📂 Bulk CSV Prediction":
+    st.subheader("📂 Upload CSV File for Prediction")
+    uploaded_file = st.file_uploader("Upload CSV", type=["csv"])
 
-if uploaded_file is not None:
-    df = pd.read_csv(uploaded_file)
-    st.write("Uploaded Data Preview:")
-    st.dataframe(df.head())
- 
+    if uploaded_file is not None:
+        df = predict_from_csv(uploaded_file)
+        st.dataframe(df)
+
+        # Download option
+        csv = df.to_csv(index=False).encode("utf-8")
+        st.download_button("⬇️ Download Results", csv, "predictions.csv", "text/csv")
