@@ -1,44 +1,38 @@
 import pandas as pd
-import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+import joblib
 
-MODEL_PATH = "src/model.pkl"
-
-# Train & save model (run once)
-def train_and_save_model(csv_path="data/transactions_fixed.csv"):
+def train_and_save_model(csv_path):
+    # 1️⃣ CSV load karo
     df = pd.read_csv(csv_path)
+    print("Available columns:", df.columns.tolist())
 
-    # Example preprocessing (modify as per dataset)
-    X = df[["amount", "account_age"]]  # features
-    y = df["label"]  # target (0 = legit, 1 = suspicious)
+    # 2️⃣ Required features define karo
+    columns_needed = ["amount", "account_age"]  # aapke model ke liye features
+    # Jo columns exist karte hain sirf wahi use karo
+    existing_columns = [col for col in columns_needed if col in df.columns]
 
+    if not existing_columns:
+        raise ValueError("None of the required columns are present in the CSV!")
+
+    # 3️⃣ Features aur target
+    X = df[existing_columns]
+    if "is_fraud" not in df.columns:
+        raise ValueError("Target column 'is_fraud' not found in CSV!")
+    y = df["is_fraud"]
+
+    # 4️⃣ Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # 5️⃣ Model train karo
     model = RandomForestClassifier(n_estimators=100, random_state=42)
-    model.fit(X, y)
+    model.fit(X_train, y_train)
 
-    joblib.dump(model, MODEL_PATH)
-    print("✅ Model trained & saved!")
+    # 6️⃣ Model save karo
+    joblib.dump(model, "model.pkl")
+    print("Model trained and saved as 'model.pkl' successfully!")
 
-# Load trained model
-def load_model():
-    return joblib.load(MODEL_PATH)
-
-# Predict single transaction
-def predict_transaction(amount, country, account_age):
-    model = load_model()
-
-    # For simplicity, ignoring 'country' now
-    X = pd.DataFrame([[amount, account_age]], columns=["amount", "account_age"])
-    pred = model.predict(X)[0]
-    return "🚨 Suspicious" if pred == 1 else "✅ Legitimate"
-
-# Predict from CSV
-def predict_from_csv(csv_file):
-    model = load_model()
-    df = pd.read_csv(csv_file)
-
-    # Ensure correct columns
-    X = df[["amount", "account_age"]]
-    df["prediction"] = model.predict(X)
-    df["prediction"] = df["prediction"].map({0: "✅ Legitimate", 1: "🚨 Suspicious"})
-    return df
+    # 7️⃣ Accuracy check (optional)
+    acc = model.score(X_test, y_test)
+    print(f"Model Accuracy: {acc*100:.2f}%")
